@@ -3,25 +3,29 @@ import 'package:the_cue/widgits/playlist_card.dart';
 import 'package:the_cue/widgits/popular_songs.dart';
 import 'package:the_cue/widgits/recent_playlist_card.dart';
 import 'package:the_cue/widgits/section_heading.dart';
-import 'package:the_cue/widgits/scale_transition_page.dart';
-import 'package:the_cue/screens/music_player_screen.dart';
+
+
 
 import '../models/song.dart';
 
-class HomePageContent extends StatelessWidget {
-  HomePageContent({super.key});
-  List<Song> songs = songsData.map((map) => Song(
-    image: map['image']!,
-    title: map['title']!,
-    artist: map['artist']!,
-  )).toList();
+class HomePageContent extends StatefulWidget {
+  final void Function(Song song) onSongSelected;
 
-  final void Function(BuildContext, Song) _onPlayPressed = (BuildContext context, Song song) {
-    Navigator.push(
-      context,
-      ScaleTransitionPage(widget: MusicPlayerScreen(song: song)),
-    );
-  };
+  const HomePageContent({super.key, required this.onSongSelected});
+
+  @override
+  HomePageContentState createState() => HomePageContentState();
+}
+
+class HomePageContentState extends State<HomePageContent> {
+
+  List<Song> songs = songsData
+      .map((map) => Song(
+            image: map['image']!,
+            title: map['title']!,
+            artist: map['artist']!,
+          ))
+      .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +46,13 @@ class HomePageContent extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     foregroundColor: const Color(0xFF161616),
                     backgroundColor: Colors.orange.shade400,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), // text color
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24)), // text color
                   ),
-                  child: const Text('Explore All',
+                  child: const Text(
+                    'Explore All',
                     style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'Source Sans Pro',
@@ -56,7 +63,6 @@ class HomePageContent extends StatelessWidget {
               ],
             ),
           ),
-
           const SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -109,10 +115,13 @@ class HomePageContent extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     foregroundColor: const Color(0xFF161616),
                     backgroundColor: const Color(0xFFFFA726),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24)),
                   ),
-                  child: const Text('Discover More',
+                  child: const Text(
+                    'Discover More',
                     style: TextStyle(
                       fontSize: 12,
                       fontFamily: 'Source Sans Pro',
@@ -123,7 +132,6 @@ class HomePageContent extends StatelessWidget {
               ],
             ),
           ),
-
           const SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -158,12 +166,19 @@ class HomePageContent extends StatelessWidget {
             ),
           ),
           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0), // padding around the list
+            padding: EdgeInsets.symmetric(
+                horizontal: 16.0), // padding around the list
             child: SectionHeading(heading: 'Popular Songs'),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.3, // specify the height you want
-            child: PopularSongs(songs: songs, onPlayPressed: _onPlayPressed),
+            height: MediaQuery.of(context).size.height *
+                0.3, // specify the height you want
+            child: PopularSongs(
+              songs: songs,
+              onPlayPressed: (BuildContext context, Song song) {
+                widget.onSongSelected(song);
+              },
+            ),
           ),
         ],
       ),

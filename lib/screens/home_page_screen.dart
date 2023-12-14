@@ -6,6 +6,7 @@ import 'package:the_cue/screens/search_page.dart';
 import 'package:the_cue/screens/settings_screen.dart';
 import 'package:the_cue/screens/music_player_screen.dart';
 
+
 import '../models/song.dart';
 
 
@@ -38,7 +39,12 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> widgetOptions = <Widget>[
-      HomePageContent(),
+      HomePageContent(onSongSelected: (song) {
+        setState(() {
+          _selectedSong = song;
+          _selectedIndex = 2;  // switch to music player screen
+        });
+      }),
       SearchPage(onSongSelected: (song) {
         setState(() {
           _selectedSong = song;
@@ -48,7 +54,7 @@ class HomePageState extends State<HomePage> {
       MusicPlayerScreen(song: _selectedSong),
       MusicLibrary(onSongSelected: (song) {
         setState(() {
-          _selectedSong = song as Song;
+          _selectedSong = song;
           _selectedIndex = 2;  // switch to music player screen
         });
       }),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../data/songs.dart';
+import '../models/song.dart';
 
 class MusicLibrary extends StatefulWidget {
-  final ValueChanged<Map<String, String>> onSongSelected;
+  final void Function(Song song) onSongSelected;
 
   const MusicLibrary({super.key, required this.onSongSelected});
 
@@ -11,7 +11,7 @@ class MusicLibrary extends StatefulWidget {
 }
 
 class MusicLibraryState extends State<MusicLibrary> {
-  late List<Map<String, String>> allSongs;
+  late List<Song> allSongs;
 
   @override
   void initState() {
@@ -21,23 +21,24 @@ class MusicLibraryState extends State<MusicLibrary> {
 
   void showSongsByArtist(String artist) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          List<Map<String, String>> songsByArtist = allSongs
-              .where((song) => song['artist'] == artist)
-              .toList();
+      context: context,
+      builder: (BuildContext context) {
+        List<Song> songsByArtist = allSongs
+            .where((song) => song.artist.toLowerCase() == artist.toLowerCase())
+            .toList();
 
-          return ListView.builder(
-            itemCount: songsByArtist.length,
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                leading: Image.asset(songsByArtist[index]['image'] ?? 'assets/images/default.png'),
-                title: Text(songsByArtist[index]['title'] ?? 'No Title'),
-                subtitle: Text(songsByArtist[index]['artist'] ?? 'No Artist'),
-              );
-            },
-          );
-        }
+        return ListView.builder(
+          itemCount: songsByArtist.length,
+          itemBuilder: (BuildContext context, int index) {
+            Song song = songsByArtist[index];
+            return ListTile(
+              leading: Image.asset(song.image),
+              title: Text(song.title, style: const TextStyle(color: Colors.white)),
+              subtitle: Text(song.artist, style: const TextStyle(color: Colors.white)),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -49,14 +50,14 @@ class MusicLibraryState extends State<MusicLibrary> {
         itemCount: allSongs.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            leading: Image.asset(allSongs[index]['image'] ?? 'assets/images/default.png'),
-            title: Text(allSongs[index]['title'] ?? 'No Title', style: const TextStyle(color: Colors.white)),
-            subtitle: Text(allSongs[index]['artist'] ?? 'No Artist', style: const TextStyle(color: Colors.white)),
+            leading: Image.asset(allSongs[index].image),
+            title: Text(allSongs[index].title, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(allSongs[index].artist, style: const TextStyle(color: Colors.white)),
             trailing: IconButton(icon: const Icon(Icons.play_circle_outline, color: Color(0xFFFFA726)),
                 onPressed: () {
                   widget.onSongSelected(allSongs[index]);
                 }),
-            onTap: () => showSongsByArtist(allSongs[index]['artist']! ),
+            onTap: () => showSongsByArtist(allSongs[index].artist),
           );
         },
       ),
