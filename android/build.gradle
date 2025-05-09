@@ -1,12 +1,15 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.24' // Updated Kotlin version
     repositories {
         google()
         mavenCentral()
+        
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:8.1.0' // Revert AGP to 8.1.0
+
     }
 }
 
@@ -14,6 +17,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+       
     }
 }
 

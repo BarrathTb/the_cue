@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 class NavRoute extends StatefulWidget {
   final int currentIndex;
   final Function(int) valueChanged;
+  final List<BottomNavigationBarItem> items; // Add items parameter
 
-  const NavRoute({super.key, required this.currentIndex, required this.valueChanged});
+  const NavRoute(
+      {super.key,
+      required this.currentIndex,
+      required this.valueChanged,
+      required this.items}); // Require items
 
   @override
   NavRouteState createState() => NavRouteState();
 }
-
 
 class NavRouteState extends State<NavRoute> {
   int _currentIndex = 0;
@@ -22,7 +26,6 @@ class NavRouteState extends State<NavRoute> {
 
   @override
   Widget build(BuildContext context) {
-
     return Theme(
       data: Theme.of(context).copyWith(
         canvasColor: const Color(0xFF212121),
@@ -30,37 +33,14 @@ class NavRouteState extends State<NavRoute> {
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-        widget.valueChanged(index);
-        onTabTapped(index);
+          widget.valueChanged(index);
+          onTabTapped(index);
         },
         type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.play_circle_fill_outlined),
-            label: 'Player',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.library_music),
-            label: 'Library',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-          // Add more icons as per your need
-        ],
+        items: widget.items, // Use the provided items
         unselectedItemColor: Colors.white,
         selectedItemColor: Colors.orange[400],
         backgroundColor: const Color(0xFF212121),
-
       ),
     );
   }

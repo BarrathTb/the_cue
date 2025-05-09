@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -24,7 +27,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.the_cue"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 35 // Keep only this one
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -41,15 +44,18 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.example.the_cue"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+       applicationId "com.example.the_cue"
+        minSdkVersion 23
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [
+                'applicationName': 'android.app.Application', // Re-add applicationName placeholder
+                redirectSchemeName: "spotify-sdk",
+                redirectHostName: "auth"
+        ]
     }
+
 
     buildTypes {
         release {
@@ -58,10 +64,16 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-}
 
 flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    // Explicitly define the spotify-app-remote dependency to help with namespace resolution
+    implementation project(':spotify-app-remote')
+    implementation "com.google.code.gson:gson:2.8.9"
+}
+
+
+}

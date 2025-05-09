@@ -9,6 +9,9 @@
 .history
 .svn/
 migrate_working_dir/
+*.env
+*.env.*
+.env
 
 # IntelliJ related
 *.iml
@@ -16,10 +19,8 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code related
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -41,3 +42,52 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Google services and sensitive files
+google-services.json
+**/google-services.json
+**/hash_key.txt
+
+# Android build artifacts
+**/android/app/cxx/
+**/android/**/cxx/Debug/
+android/spotify-app-remote/
+
+# CMake related
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CMakeFiles/
+**/*.ninja
+**/build.ninja
+**/*.bin
+**/configure_fingerprint.bin
+
+# Build files
+**/*_command.txt
+**/*metadata_generation_command.txt
+**/additional_project_files.txt
+**/build_file_index.txt
+**/symbol_folder_index.txt
+**/rules.ninja
+**/TargetDirectories.txt
+
+# Cache files
+**/cache-v2*
+**/cmakeFiles-v1*
+**/codemodel-v2*
+**/directory-*
+**/index-*
+**/*.json.bin
+**/prefab_config.json
+**/android_gradle_build*.json
+**/android_gradle_build_mini.json
+
+# Architecture specific build dirs
+**/*armeabi-v7a*
+**/*arm64-v8a*
+
+# CMake compiler files
+**/CMakeCXXCompiler.cmake
+**/CMakeCCompilerId.*
+**/CMakeDetermineCompilerABI_*
+**/CMakeSystem.cmake

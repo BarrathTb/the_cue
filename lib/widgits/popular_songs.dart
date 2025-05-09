@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../models/song.dart';
+import '../models/track.dart';
 
 class PopularSongs extends StatelessWidget {
-  final List<Song> songs;
-  final void Function(BuildContext, Song) onPlayPressed;
+  final List<Track> tracks;
+  final void Function(BuildContext, Track) onPlayPressed;
 
-  const PopularSongs({super.key, required this.songs, required this.onPlayPressed});
+  const PopularSongs(
+      {super.key, required this.tracks, required this.onPlayPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class PopularSongs extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: SingleChildScrollView(
         child: Column(
-          children: songs.map((Song song) {
+          children: tracks.map((Track track) {
             return Container(
               margin: const EdgeInsets.only(bottom: 16),
               child: Row(
@@ -21,10 +22,28 @@ class PopularSongs extends StatelessWidget {
                   SizedBox(
                     width: 40,
                     height: 40,
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage(
-                        song.image.isNotEmpty ? song.image : 'assets/images/default_image.png',
+                    child: ClipOval(
+                      child: Image(
+                        image: track.imageUrl.isNotEmpty
+                            ? NetworkImage(track.imageUrl)
+                            : const AssetImage(
+                                    'assets/images/default_image.png')
+                                as ImageProvider,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/default_image.png',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFFFA726),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -34,7 +53,9 @@ class PopularSongs extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          song.title.isNotEmpty ? song.title : 'Default title',
+                          track.title.isNotEmpty
+                              ? track.title
+                              : 'Default title',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -43,7 +64,9 @@ class PopularSongs extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          song.artist.isNotEmpty ? song.artist : 'Default artist',
+                          track.artist.isNotEmpty
+                              ? track.artist
+                              : 'Default artist',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
@@ -58,7 +81,7 @@ class PopularSongs extends StatelessWidget {
                       Icons.play_circle_outline,
                       color: Color(0xFFFFA726),
                     ),
-                    onPressed: () => onPlayPressed(context, song),
+                    onPressed: () => onPlayPressed(context, track),
                   ),
                 ],
               ),

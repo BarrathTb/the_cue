@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'profile_screen.dart'; // Import ProfileScreen
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -9,7 +11,7 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsScreenState extends State<SettingsScreen> {
   int? radioValue = 0;
-  bool isSwitchSaved = false;   // For "Save Songs" switch
+  bool isSwitchSaved = false; // For "Save Songs" switch
   bool isSwitchLocation = false; // For "Location Access" switch
   bool isSwitchFaceDetected = false; // For "Enable Face Detection" switch
 
@@ -19,6 +21,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       radioValue = value;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,13 +53,24 @@ class SettingsScreenState extends State<SettingsScreen> {
               ElevatedButton(
                 onPressed: null,
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                         Colors.orange[400]!)), // Your desired button color
                 child: const Text('Upgrade to Premium',
                     style: TextStyle(fontSize: 20, color: Colors.white)),
               ),
               const SizedBox(height: 30),
             ],
+          ),
+          ListTile(
+            // Add Profile option
+            leading: const Icon(Icons.person, color: Colors.white),
+            title: const Text('Profile', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
           ),
           const TextField(
             style: TextStyle(color: Colors.white),
@@ -71,7 +85,8 @@ class SettingsScreenState extends State<SettingsScreen> {
             decoration: InputDecoration(
               hintStyle: TextStyle(color: Colors.white),
               hintText: 'Enter your phone number...',
-              prefixIcon: Icon(Icons.phone_android_outlined, color: Colors.white),
+              prefixIcon:
+                  Icon(Icons.phone_android_outlined, color: Colors.white),
             ),
           ),
           const TextField(
@@ -79,7 +94,8 @@ class SettingsScreenState extends State<SettingsScreen> {
             decoration: InputDecoration(
               hintStyle: TextStyle(color: Colors.white),
               hintText: 'Enter your location...',
-              prefixIcon: Icon(Icons.location_city_outlined, color: Colors.white),
+              prefixIcon:
+                  Icon(Icons.location_city_outlined, color: Colors.white),
             ),
           ),
           const SizedBox(height: 30),
@@ -92,7 +108,8 @@ class SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.save, color: Colors.white),
-            title: const Text('Save Songs', style: TextStyle(color: Colors.white)),
+            title:
+                const Text('Save Songs', style: TextStyle(color: Colors.white)),
             trailing: Switch(
               value: isSwitchSaved,
               activeColor: Colors.orange[400],
@@ -104,13 +121,13 @@ class SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.location_on_outlined, color: Colors.white),
-            title: const Text('Location Access', style: TextStyle(color: Colors.white)),
+            leading:
+                const Icon(Icons.location_on_outlined, color: Colors.white),
+            title: const Text('Location Access',
+                style: TextStyle(color: Colors.white)),
             trailing: Switch(
               value: isSwitchLocation,
               activeColor: Colors.orange[400],
-
-
               onChanged: (bool value) {
                 setState(() {
                   isSwitchLocation = value;
@@ -118,10 +135,11 @@ class SettingsScreenState extends State<SettingsScreen> {
               },
             ),
           ),
-
           ListTile(
-            leading: const Icon(Icons.face_unlock_outlined, color: Colors.white),
-            title: const Text('Enable Face Detection', style: TextStyle(color: Colors.white)),
+            leading:
+                const Icon(Icons.face_unlock_outlined, color: Colors.white),
+            title: const Text('Enable Face Detection',
+                style: TextStyle(color: Colors.white)),
             trailing: Switch(
               value: isSwitchFaceDetected,
               activeColor: Colors.orange[400],

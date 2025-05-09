@@ -1,91 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+
+import '../models/playlist.dart';
+import '../services/playlist_service.dart';
+
+final Logger _logger = Logger();
 
 class PlaylistCard extends StatelessWidget {
   const PlaylistCard({
     super.key,
-    required this.title,
-    required this.description,
-    required this.imagePath,
+    required this.playlist,
+    required this.onTap,
   });
 
-  final String title;
-  final String description;
-  final String imagePath;
+  final PlaylistModel playlist;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      width: 157,
-      height: 100,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(imagePath),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.all(16),
+        width: 170,
+        height: 120,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(playlist.imageUrl),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
               Colors.blueGrey.shade900.withOpacity(0.7),
-              BlendMode.srcOver
+              BlendMode.srcOver,
+            ),
           ),
+          borderRadius: BorderRadius.circular(24),
         ),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),  // add some padding here
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,  // align text to the start
-          children: <Widget>[
-            Text(
-
-              title,
-              textAlign: TextAlign.center,
-
-              style: const TextStyle(
-                color: Colors.white,  // change this as needed
-                fontWeight: FontWeight.w900,
-                fontSize: 16,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                // Wrap Name Text with Expanded
+                child: Text(
+                  playlist.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16, // Keep original font size for name
+                  ),
+                ),
               ),
-            ),
-            Text(
-
-              description,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 12
-
-              ),  // change this as needed
-            ),
-          ],
+              const SizedBox(height: 4), // Add a small space between texts
+              Expanded(
+                // Wrap Description Text with Expanded
+                child: Text(
+                  playlist.description,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12, // Increased description font size
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class CardList extends StatelessWidget {
-  final List<String> titles = ['Title1', 'Title2', 'Title3'];
-  final List<String> descriptions = ['Description1', 'Description2', 'Description3'];
-  final List<String> imagePaths = ['imagePath1', 'imagePath2', 'imagePath3'];
+class CardList extends StatefulWidget {
+  const CardList({super.key});
 
-  CardList({super.key});
+  @override
+  State<CardList> createState() => _CardListState();
+}
+
+class _CardListState extends State<CardList> {
+  List<PlaylistModel> playlists = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlaylists();
+  }
+
+  Future<void> _loadPlaylists() async {
+    final fetchedPlaylists = await PlaylistService.getUserPlaylists();
+    setState(() {
+      playlists = fetchedPlaylists;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return ListView.builder(
-      itemCount: titles.length,
+      itemCount: playlists.length,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: PlaylistCard(
-            title: titles[index],
-            description: descriptions[index],
-            imagePath: imagePaths[index],
+            playlist: playlists[index],
+            onTap: () {
+              // Handle playlist selection
+              _logger.i('Selected playlist: ${playlists[index].name}');
+            },
           ),
         );
       },
     );
   }
 }
-

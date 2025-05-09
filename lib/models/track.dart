@@ -1,4 +1,4 @@
-// // song.dart
+// // track.dart
 //
 // class Song {
 //   String image;
@@ -85,6 +85,7 @@ class Track {
   final String artist;
   final String title;
   final int duration;
+  final String? previewUrl; // Added for preview functionality
 
   Track({
     required this.id,
@@ -93,16 +94,32 @@ class Track {
     required this.artist,
     required this.title,
     required this.duration,
+    this.previewUrl,
   });
 
-  factory Track.fromSpotifyTrack(dynamic track) {
+  factory Track.fromSpotifyTrack(dynamic trackData) {
+    // Safely access nested data from the JSON map
+    String imageUrl = 'assets/images/default_image.png'; // Default image
+    if (trackData['album'] != null &&
+        trackData['album']['images'] != null &&
+        (trackData['album']['images'] as List).isNotEmpty) {
+      imageUrl = trackData['album']['images'][0]['url'] ?? imageUrl;
+    }
+
+    String artistName = 'Unknown Artist';
+    if (trackData['artists'] != null &&
+        (trackData['artists'] as List).isNotEmpty) {
+      artistName = trackData['artists'][0]['name'] ?? artistName;
+    }
+
     return Track(
-      id: track.uri.split(':').last,
-      uri: track.uri,
-      imageUrl: track.imageUri.raw,
-      artist: track.artist.name,
-      title: track.name,
-      duration: track.duration,
+      id: trackData['id'] ?? 'unknown_id',
+      uri: trackData['uri'] ?? '',
+      imageUrl: imageUrl,
+      artist: artistName,
+      title: trackData['name'] ?? 'Unknown Title',
+      duration: trackData['duration_ms'] ?? 0,
+      previewUrl: trackData['preview_url'], // Get preview_url
     );
   }
 }

@@ -1,32 +1,63 @@
+import 'package:firebase_auth/firebase_auth.dart'
+    as firebase_auth; // Import Firebase Auth with alias
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
 import 'package:flutter/material.dart';
-import 'screens/login_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:the_cue/services/spotify_service.dart';
 import 'package:the_cue/widgits/scale_transition_page.dart';
 
+import 'screens/home_page_screen.dart'; // Import HomePage
+import 'screens/login_screen.dart';
+import 'screens/registration_screen.dart'; // Import Registration Screen
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure Flutter binding is initialized
+  await Firebase.initializeApp(); // Initialize Firebase
+  await dotenv.load();
+  await SpotifyService.connectToSpotify();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key}); // fixed this line, you forgot to provide a variable 'key' for 'super.key'
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'The Cue',
       theme: ThemeData(
-        primaryColor: Colors.grey[900], // sets the prominent color to grey[800]
-
+        primaryColor: Colors.grey[900],
       ),
-      home: const WelcomeScreen(),
+      // Check authentication state and navigate accordingly
+      home: StreamBuilder<firebase_auth.User?>(
+        stream: firebase_auth.FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Show a loading indicator while checking auth state
+            return const Scaffold(
+              backgroundColor: Color(0xFF161616),
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (snapshot.hasData) {
+            // User is logged in, navigate to HomePage
+            return const HomePage();
+          } else {
+            // User is not logged in, show WelcomeScreen
+            return const WelcomeScreen();
+          }
+        },
+      ),
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const MyApp(), // ensure the exact name of HomePage class
+        '/home': (context) => const HomePage(), // Corrected route to HomePage
+        '/register': (context) =>
+            const RegistrationScreen(), // Add registration route
       },
     );
   }
 }
-
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -35,8 +66,8 @@ class WelcomeScreen extends StatefulWidget {
   WelcomeScreenState createState() => WelcomeScreenState();
 }
 
-
-class WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin {
+class WelcomeScreenState extends State<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
@@ -66,7 +97,8 @@ class WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderS
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
                   image: const DecorationImage(
-                    image: AssetImage('assets/images/the_cue_welcome_party.jpeg'),
+                    image:
+                        AssetImage('assets/images/the_cue_welcome_party.jpeg'),
                     fit: BoxFit.cover,
                   ),
                 ),
