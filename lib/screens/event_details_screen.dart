@@ -244,8 +244,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                     await SongRequestService()
                                         .toggleUpvote(request.id, user.uid);
                                   } catch (e) {
-                                    // Handle errors
-                                    // Check mounted *before* using context
                                     if (!mounted) return;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -254,7 +252,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                     );
                                   }
                                 } else {
-                                  // Check mounted *before* using context
                                   if (!mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
@@ -268,6 +265,35 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                               '${request.upvotes}',
                               style: const TextStyle(color: Colors.white),
                             ),
+                            // Add Prioritize Button
+                            if (FirebaseAuth.instance.currentUser != null &&
+                                request.userId ==
+                                    FirebaseAuth.instance.currentUser!.uid &&
+                                !request.isPriority)
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.star, color: Colors.amber),
+                                tooltip: 'Prioritize this request',
+                                onPressed: () async {
+                                  final messenger =
+                                      ScaffoldMessenger.of(context);
+                                  try {
+                                    await SongRequestService()
+                                        .updateRequestPriority(request.id);
+                                    messenger.showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text('Request prioritized!')),
+                                    );
+                                  } catch (e) {
+                                    messenger.showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Failed to prioritize request: $e')),
+                                    );
+                                  }
+                                },
+                              ),
                           ],
                         ),
                       ),

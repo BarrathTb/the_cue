@@ -10,6 +10,8 @@ class SongRequest {
   final String? note;
   final int upvotes;
   final List<String> upvotedBy;
+  final bool isPriority; // New field for priority status
+  final Timestamp? priorityTimestamp; // New field for priority timestamp
 
   SongRequest({
     required this.id,
@@ -21,6 +23,8 @@ class SongRequest {
     this.note,
     required this.upvotes,
     required this.upvotedBy,
+    this.isPriority = false, // Default to false
+    this.priorityTimestamp, // Nullable
   });
 
   factory SongRequest.fromFirestore(DocumentSnapshot doc) {
@@ -35,6 +39,8 @@ class SongRequest {
       note: data['note'],
       upvotes: data['upvotes'] ?? 0,
       upvotedBy: List<String>.from(data['upvotedBy'] ?? []),
+      isPriority: data['isPriority'] ?? false,
+      priorityTimestamp: data['priorityTimestamp'] as Timestamp?,
     );
   }
 
@@ -48,6 +54,8 @@ class SongRequest {
       'note': note,
       'upvotes': upvotes,
       'upvotedBy': upvotedBy,
+      'isPriority': isPriority,
+      'priorityTimestamp': priorityTimestamp,
     };
   }
 }
@@ -58,6 +66,7 @@ class TrackData {
   final String artist;
   final String albumArt;
   final int duration; // in milliseconds
+  final String uri; // Added Spotify URI
 
   TrackData({
     required this.id,
@@ -65,6 +74,7 @@ class TrackData {
     required this.artist,
     required this.albumArt,
     required this.duration,
+    required this.uri, // Added to constructor
   });
 
   factory TrackData.fromMap(Map<String, dynamic> map) {
@@ -74,6 +84,7 @@ class TrackData {
       artist: map['artist'] ?? '',
       albumArt: map['albumArt'] ?? '',
       duration: (map['duration'] ?? 0).toInt(),
+      uri: map['uri'] ?? '', // Added for URI
     );
   }
 
@@ -84,6 +95,7 @@ class TrackData {
       'artist': artist,
       'albumArt': albumArt,
       'duration': duration,
+      'uri': uri, // Added for URI
     };
   }
 }

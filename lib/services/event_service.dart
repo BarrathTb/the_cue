@@ -77,4 +77,16 @@ class EventService {
       rethrow;
     }
   }
+
+  // Update only the requestsOpen status of an event
+  Future<void> updateEventRequestsStatus(String eventId, bool isOpen) async {
+    try {
+      await _firestore.collection('events').doc(eventId).update({
+        'requestsOpen': isOpen,
+      });
+    } catch (e) {
+      _logger.e('Error updating event requests status: $e');
+      rethrow;
+    }
+  }
 }

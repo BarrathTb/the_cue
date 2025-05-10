@@ -14,17 +14,30 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _displayNameController =
+      TextEditingController(); // Add displayName controller
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _displayNameController.dispose(); // Dispose displayName controller
     super.dispose();
   }
 
   final UserService _userService = UserService(); // Create UserService instance
 
   Future<void> _registerWithEmailAndPassword() async {
+    if (_displayNameController.text.trim().isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a display name.'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
     try {
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -37,7 +50,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         uid: userCredential.user!.uid,
         email: _emailController.text.trim(),
         displayName:
-            _emailController.text.trim(), // Using email as display name for now
+            _displayNameController.text.trim(), // Use the entered display name
       );
 
       // Navigate to home page on successful registration
@@ -107,6 +120,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 ),
               ),
               const SizedBox(height: 32),
+              _buildInput('Display Name',
+                  controller: _displayNameController), // Add Display Name field
+              const SizedBox(height: 16),
               _buildInput('Email', controller: _emailController),
               const SizedBox(height: 16),
               _buildInput('Password',

@@ -28,12 +28,15 @@ class SongRequestService {
           artist: track.artist,
           albumArt: track.imageUrl,
           duration: track.duration, // Use the correct duration property
+          uri: track.uri, // Pass the track URI
         ),
         status: 'pending', // Initial status
         requestTime: Timestamp.now(),
         note: note,
         upvotes: 0,
         upvotedBy: [],
+        isPriority: false, // Initialize new field
+        priorityTimestamp: null, // Initialize new field
       );
 
       await newRequestRef.set(songRequest.toFirestore());
@@ -48,7 +51,11 @@ class SongRequestService {
     return _firestore
         .collection('songRequests')
         .where('eventId', isEqualTo: eventId)
-        .orderBy('requestTime', descending: true) // Order by request time
+        .orderBy('isPriority', descending: true)
+        .orderBy('priorityTimestamp',
+            descending: false) // Ascending for timestamp
+        .orderBy('upvotes', descending: true)
+        .orderBy('requestTime', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => SongRequest.fromFirestore(doc))
@@ -62,7 +69,11 @@ class SongRequestService {
         .collection('songRequests')
         .where('eventId', isEqualTo: eventId)
         .where('status', isEqualTo: status)
-        .orderBy('requestTime', descending: true) // Order by request time
+        .orderBy('isPriority', descending: true)
+        .orderBy('priorityTimestamp',
+            descending: false) // Ascending for timestamp
+        .orderBy('upvotes', descending: true)
+        .orderBy('requestTime', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
             .map((doc) => SongRequest.fromFirestore(doc))
@@ -115,6 +126,20 @@ class SongRequestService {
       await _firestore.collection('songRequests').doc(requestId).delete();
     } catch (e) {
       _logger.e('Error deleting song request: $e');
+      rethrow;
+    }
+  }
+
+  // Update a song request to be a priority request
+  Future<void> updateRequestPriority(String requestId) async {
+    try {
+      await _firestore.collection('songRequests').doc(requestId).update({
+        'isPriority': true,
+        'priorityTimestamp':
+            FieldValue.serverTimestamp(), // Use server timestamp
+      });
+    } catch (e) {
+      _logger.e('Error updating request priority: $e');
       rethrow;
     }
   }

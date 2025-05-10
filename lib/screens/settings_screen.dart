@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'package:flutter/material.dart';
+import 'package:the_cue/main.dart'; // Import WelcomeScreen or your initial screen
 
 import 'profile_screen.dart'; // Import ProfileScreen
 
@@ -150,6 +152,31 @@ class SettingsScreenState extends State<SettingsScreen> {
               },
             ),
           ),
+          const SizedBox(height: 30),
+          Center(
+            child: ElevatedButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (!mounted) return;
+                // Navigate to the initial screen after logout
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          const WelcomeScreen()), // Or your initial screen
+                  (Route<dynamic> route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                textStyle: const TextStyle(fontSize: 18, color: Colors.white),
+              ),
+              child:
+                  const Text('Log Out', style: TextStyle(color: Colors.white)),
+            ),
+          ),
+          const SizedBox(height: 20), // Add some spacing at the bottom
         ],
       ),
     );

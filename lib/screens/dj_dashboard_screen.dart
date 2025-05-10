@@ -7,6 +7,7 @@ import '../models/song_request.dart';
 import '../services/event_service.dart';
 import '../services/song_request_service.dart';
 import '../services/spotify_service.dart'; // Import SpotifyService
+import 'create_event_screen.dart'; // Import the new screen
 
 final Logger _logger = Logger();
 
@@ -44,6 +45,18 @@ class _DjDashboardScreenState extends State<DjDashboardScreen> {
       appBar: AppBar(
         title: const Text('DJ Dashboard'),
         backgroundColor: const Color(0xFF161616),
+        foregroundColor: Colors.white,
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CreateEventScreen()),
+          );
+        },
+        label: const Text('New Event'),
+        icon: const Icon(Icons.add),
+        backgroundColor: const Color(0xFFFF9100),
         foregroundColor: Colors.white,
       ),
       body: StreamBuilder<List<Event>>(
@@ -113,6 +126,62 @@ class _DjDashboardScreenState extends State<DjDashboardScreen> {
                   }).toList(),
                 ),
               ),
+              if (_selectedEvent !=
+                  null) // Show toggle only if an event is selected
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Accepting Requests:',
+                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                      Switch(
+                        value: _selectedEvent!.requestsOpen,
+                        onChanged: (bool newValue) async {
+                          final messenger = ScaffoldMessenger.of(
+                              context); // Capture messenger
+                          try {
+                            // Create a new Event object with the updated requestsOpen status
+                            // It's important to pass all existing fields to avoid overwriting them
+                            // if updateEvent in EventService uses set() instead of update().
+                            // Assuming EventService.updateEvent can handle partial updates or
+                            // we create a specific method for toggling requestsOpen.
+
+                            // For simplicity, let's assume we need to update the specific field.
+                            // We'll add a new method to EventService for this.
+                            await eventService.updateEventRequestsStatus(
+                                _selectedEvent!.id, newValue);
+
+                            // No need to manually update _selectedEvent.requestsOpen here if
+                            // the stream rebuilds the widget with fresh data.
+                            // However, for immediate UI feedback before stream update:
+                            // setState(() {
+                            //   _selectedEvent = _selectedEvent!.copyWith(requestsOpen: newValue);
+                            // });
+
+                            messenger.showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Requests ${newValue ? "opened" : "closed"} successfully.')),
+                            );
+                          } catch (e) {
+                            _logger.e('Failed to update requests status: $e');
+                            messenger.showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to update requests status: $e')),
+                            );
+                            // Optionally revert switch state if update failed, though stream should correct it
+                          }
+                        },
+                        activeColor: const Color(0xFFFF9100),
+                        inactiveThumbColor: Colors.grey,
+                        inactiveTrackColor: Colors.grey[700],
+                      ),
+                    ],
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: SegmentedButton<String>(
@@ -333,7 +402,7 @@ class _DjDashboardScreenState extends State<DjDashboardScreen> {
                                         // Play the song using Spotify SDK
                                         await SpotifyService.playSong(request
                                             .trackData
-                                            .id); // Assuming trackData.id is the Spotify URI
+                                            .uri); // Use the trackData.uri
                                         await songRequestService
                                             .updateSongRequestStatus(
                                                 request.id, 'played');
